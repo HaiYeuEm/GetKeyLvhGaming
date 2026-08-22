@@ -77,7 +77,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 45)
 title.Position = UDim2.new(0, 0, 0, 5)
 title.BackgroundTransparency = 1
-title.Text = "✦  KEY SYSTEM  ✦"
+title.Text = "🔑  KEY SYSTEM  🔑"
 title.TextColor3 = Color3.fromRGB(0, 212, 255)
 title.TextSize = 24
 title.Font = Enum.Font.GothamBold
@@ -125,7 +125,6 @@ activateBtn.Parent = mainFrame
 roundCorner(activateBtn, 12)
 addStroke(activateBtn, Color3.fromRGB(0, 212, 255), 1.5, 0.4)
 
--- Hiệu ứng lún/nảy cho activateBtn
 local actScale = addPressEffect(activateBtn)
 
 activateBtn.MouseEnter:Connect(function()
@@ -153,7 +152,6 @@ getKeyBtn.Parent = mainFrame
 roundCorner(getKeyBtn, 10)
 addStroke(getKeyBtn, Color3.fromRGB(0, 212, 255), 1.5, 0.35)
 
--- Hiệu ứng lún/nảy cho getKeyBtn
 local getScale = addPressEffect(getKeyBtn)
 
 getKeyBtn.MouseEnter:Connect(function()
@@ -179,21 +177,36 @@ statusLabel.Parent = mainFrame
 
 local scriptActivated = false
 
+local function destroyUI()
+    TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(title, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {TextTransparency = 1}):Play()
+    TweenService:Create(subTitle, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {TextTransparency = 1}):Play()
+    TweenService:Create(keyBox, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+    TweenService:Create(activateBtn, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+    TweenService:Create(getKeyBtn, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+    TweenService:Create(statusLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {TextTransparency = 1}):Play()
+    task.wait(0.6)
+    gui:Destroy()
+end
+
 local function runMainScript()
-    if scriptActivated then return end
+    if scriptActivated then return false end
     scriptActivated = true
 
     print("✅ SCRIPT CHÍNH ĐANG ĐƯỢC LOAD...")
+    statusLabel.Text = "⏳ Đang tải script..."
+    statusLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+
     local success, err = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/levanhai797130-ops/Test/refs/heads/main/Test.lua"))()
     end)
-    
+
     if not success then
         warn("❌ Lỗi tải script: " .. tostring(err))
         statusLabel.Text = "❌ Lỗi tải script! Vui lòng thử lại."
         statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
         scriptActivated = false
-        return
+        return false
     end
 
     statusLabel.Text = "✅ Đã kích hoạt thành công! Chúc bạn chơi vui vẻ ❤️"
@@ -207,6 +220,10 @@ local function runMainScript()
     subTitle.Text = "Script đã được kích hoạt!"
     mainFrame.BackgroundColor3 = Color3.fromRGB(0, 20, 0)
     addStroke(mainFrame, Color3.fromRGB(0, 255, 100), 2.5, 0.25)
+
+    task.wait(1.2)
+    destroyUI()
+    return true
 end
 
 getKeyBtn.MouseButton1Click:Connect(function()
