@@ -1,0 +1,125 @@
+return {
+
+    -- ================================================================
+    -- ADMIN KEY
+    -- Không tính vào 100 key người dùng
+    -- ================================================================
+
+    ["ADMIN_DEPTRAI"] = true,
+
+
+    -- ================================================================
+    -- 100 USER KEYS
+    -- ================================================================
+
+    ["LVH_A7K9P2X4QM"] = true,
+    ["LVH_B3N8W5R1ZT"] = true,
+    ["LVH_C6Q2M9Y7KP"] = true,
+    ["LVH_D4X8L1V6NS"] = true,
+    ["LVH_E9T3K7P5WR"] = true,
+    ["LVH_F2M8Q6Z4YA"] = true,
+    ["LVH_G5R1N9X3KC"] = true,
+    ["LVH_H8W4P2L7MQ"] = true,
+    ["LVH_J6Y9T3V1RX"] = true,
+    ["LVH_K2Q7M5N8ZP"] = true,
+
+    ["LVH_L9X4R6T2WK"] = true,
+    ["LVH_M3P8Y1Q7VN"] = true,
+    ["LVH_N6K2Z9W4RL"] = true,
+    ["LVH_P5T7X3M8QY"] = true,
+    ["LVH_Q8V1N6K4ZR"] = true,
+    ["LVH_R2W9P5L7TX"] = true,
+    ["LVH_S4Y6Q1M8NK"] = true,
+    ["LVH_T7K3X9V2RP"] = true,
+    ["LVH_V1N5Z8Q4LY"] = true,
+    ["LVH_W6R2M7T9XP"] = true,
+
+    ["LVH_X3Q8K1N6VZ"] = true,
+    ["LVH_Y9P4T7R2MW"] = true,
+    ["LVH_Z5L6X3Q8KN"] = true,
+    ["LVH_A2V9M4P7RT"] = true,
+    ["LVH_B8K3Y6N1QW"] = true,
+    ["LVH_C4R7Z2X9MP"] = true,
+    ["LVH_D1T5Q8V3LK"] = true,
+    ["LVH_E7N2W9P4XR"] = true,
+    ["LVH_F6M3K8Y1ZT"] = true,
+    ["LVH_G9Q5R2V7NX"] = true,
+
+    ["LVH_H4X1P6M8QZ"] = true,
+    ["LVH_J7T9N3K2WR"] = true,
+    ["LVH_K5V8Y4Q1LP"] = true,
+    ["LVH_L2R6X9M3ZT"] = true,
+    ["LVH_M8Q1W5N7YK"] = true,
+    ["LVH_N4P9T2V6XR"] = true,
+    ["LVH_P7K3Z8Q5MW"] = true,
+    ["LVH_Q2Y6R1N9TV"] = true,
+    ["LVH_R8M4X7P3LK"] = true,
+    ["LVH_S5N9Q2W6YZ"] = true,
+
+    ["LVH_T1V8K4M7XR"] = true,
+    ["LVH_V6P2Z9N5QW"] = true,
+    ["LVH_W3R7Y1X8MK"] = true,
+    ["LVH_X9Q4T6L2VP"] = true,
+    ["LVH_Y5N8M3K7ZR"] = true,
+    ["LVH_Z2W6P9Q4TX"] = true,
+    ["LVH_A8R3V5N1YK"] = true,
+    ["LVH_B6X9Q2M4WP"] = true,
+    ["LVH_C1K7T8Z3NR"] = true,
+    ["LVH_D5P2Y6V9XQ"] = true,
+
+    ["LVH_E8M4R1K7ZT"] = true,
+    ["LVH_F3Q9N5W2YP"] = true,
+    ["LVH_G7V1X6M8KR"] = true,
+    ["LVH_H2Z5P9T4NQ"] = true,
+    ["LVH_J8Y3K1R6VW"] = true,
+    ["LVH_K4M7Q2X9LP"] = true,
+    ["LVH_L1N6Z8P3YR"] = true,
+    ["LVH_M5T9V4K2XW"] = true,
+    ["LVH_N7Q1R6Y8MP"] = true,
+    ["LVH_P3X5W9Z2TK"] = true,
+
+    ["LVH_Q6K8M1V4NR"] = true,
+    ["LVH_R9P2Y7X5LW"] = true,
+    ["LVH_S1Z4Q8N6VK"] = true,
+    ["LVH_T5M3R9K1XP"] = true,
+    ["LVH_V8W6P2Y4ZQ"] = true,
+    ["LVH_W1N7X5M9KR"] = true,
+    ["LVH_X4Q8T3V6LP"] = true,
+    ["LVH_Y7K2R9N5MW"] = true,
+    ["LVH_Z3P6M1Q8XT"] = true,
+    ["LVH_A9V4Y7K2NR"] = true,
+
+    ["LVH_B5X1Q8M6WP"] = true,
+    ["LVH_C7N3Z9R4YK"] = true,
+    ["LVH_D2K6V5P8XQ"] = true,
+    ["LVH_E4M9T1W7ZR"] = true,
+    ["LVH_F8Q2Y6N3KP"] = true,
+    ["LVH_G1R5X9V4MW"] = true,
+    ["LVH_H6P3K8Z2YT"] = true,
+    ["LVH_J9N4Q7M1XR"] = true,
+    ["LVH_K3W8V5T2LP"] = true,
+    ["LVH_L7Y1R6X9NQ"] = true,
+
+    ["LVH_M2Z8P4K7VW"] = true,
+    ["LVH_N5Q9X3T1YR"] = true,
+    ["LVH_P8M6V2R4ZK"] = true,
+    ["LVH_Q1K5Y9N7XP"] = true,
+    ["LVH_R4T8W2M6VZ"] = true,
+    ["LVH_S9X3P7Q1NK"] = true,
+    ["LVH_T2V6R8Y4MW"] = true,
+    ["LVH_V5N1K9Z3QP"] = true,
+    ["LVH_W8Q4M2X7YR"] = true,
+    ["LVH_X1P6T9V3KL"] = true,
+
+    ["LVH_Y4R8N2Q5ZW"] = true,
+    ["LVH_Z7M3K6P1XT"] = true,
+    ["LVH_A5Q9V2R8NK"] = true,
+    ["LVH_B1X7T4M6YP"] = true,
+    ["LVH_C9N5W3K8ZR"] = true,
+    ["LVH_D6P2Q7V1XM"] = true,
+    ["LVH_E3R8Y5N9WK"] = true,
+    ["LVH_F7M1Z4Q6TP"] = true,
+    ["LVH_G2K9X5V8NR"] = true,
+    ["LVH_H5T3P7M1YQ"] = true,
+
+}
