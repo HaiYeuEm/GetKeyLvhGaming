@@ -15,7 +15,7 @@ if not player then return end
 -- ============================================================
 
 -- URL raw của file KeyList.lua trên GitHub (chỉ chứa danh sách key)
-local GITHUB_KEYLIST_URL = "https://raw.githubusercontent.com/levanhai797130-ops/Test/refs/heads/main/KeyList.lua"
+local GITHUB_KEYLIST_URL = "https://raw.githubusercontent.com/levanhai797130-ops/GetKeyLvhGaming/refs/heads/main/KeyList.Lua"
 
 -- Định nghĩa script cho từng game (dùng game.PlaceId)
 local GAME_SCRIPTS = {
