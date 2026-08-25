@@ -1,3 +1,8 @@
+-- ============================================================
+--                 KEY SYSTEM - BẢN QUYỀN
+--       Kiểm tra key từ GitHub, load script theo game ID
+-- ============================================================
+
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -5,7 +10,25 @@ local player = Players.LocalPlayer
 
 if not player then return end
 
-local MASTER_KEY = "ADMIN_DEPTRAI"
+-- ============================================================
+--  CẤU HÌNH (SỬA THEO BẠN)
+-- ============================================================
+
+-- URL raw của file KeyList.lua trên GitHub (chỉ chứa danh sách key)
+local GITHUB_KEYLIST_URL = "https://raw.githubusercontent.com/levanhai797130-ops/Test/refs/heads/main/KeyList.lua"
+
+-- Định nghĩa script cho từng game (dùng game.PlaceId)
+local GAME_SCRIPTS = {
+    [-10959918411] = "loadstring(game:HttpGet('https://your-script-for-studio.lua'))()",   -- Game Studio Lite
+    [-107778070777162] = "loadstring(game:HttpGet('https://your-script-for-egg.lua'))()",  -- Steal a Egg
+}
+
+-- Script dùng khi game không có trong danh sách (tùy chọn)
+local FALLBACK_SCRIPT = "print('Game không được hỗ trợ. Liên hệ admin.')"
+
+-- ============================================================
+--  TẠO GIAO DIỆN (KHÔNG THAY ĐỔI)
+-- ============================================================
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "KeySystem"
@@ -167,7 +190,7 @@ local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, 0, 0, 24)
 statusLabel.Position = UDim2.new(0, 0, 0.92, 0)
 statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "🔑 Key: ADMIN_DEPTRAI"
+statusLabel.Text = "🔑 Nhập key để kích hoạt"
 statusLabel.TextColor3 = Color3.fromRGB(0, 212, 255)
 statusLabel.TextSize = 13
 statusLabel.Font = Enum.Font.GothamMedium
@@ -175,8 +198,45 @@ statusLabel.TextXAlignment = Enum.TextXAlignment.Center
 statusLabel.TextYAlignment = Enum.TextYAlignment.Top
 statusLabel.Parent = mainFrame
 
-local scriptActivated = false
+-- ============================================================
+--  LOGIC XỬ LÝ KEY VÀ LOAD SCRIPT
+-- ============================================================
 
+local scriptActivated = false
+local cachedKeyList = nil
+
+-- Hàm lấy danh sách key từ GitHub
+local function fetchKeyList()
+    if cachedKeyList then return cachedKeyList end
+    local success, result = pcall(function()
+        return game:HttpGet(GITHUB_KEYLIST_URL)
+    end)
+    if not success or not result then
+        warn("❌ Không thể tải KeyList từ GitHub")
+        return nil
+    end
+    local func, err = loadstring(result)
+    if not func then
+        warn("❌ Lỗi parse KeyList: " .. tostring(err))
+        return nil
+    end
+    local data = func()
+    if type(data) ~= "table" then
+        warn("❌ KeyList không đúng định dạng (phải là table)")
+        return nil
+    end
+    cachedKeyList = data
+    return data
+end
+
+-- Kiểm tra key có tồn tại trong danh sách không (không cần gameId)
+local function isValidKey(inputKey)
+    local keyData = fetchKeyList()
+    if not keyData then return false end
+    return keyData[inputKey] ~= nil
+end
+
+-- Hủy giao diện với hiệu ứng
 local function destroyUI()
     TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
     TweenService:Create(title, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {TextTransparency = 1}):Play()
@@ -189,27 +249,41 @@ local function destroyUI()
     gui:Destroy()
 end
 
+-- Load script dựa trên game ID
 local function runMainScript()
     if scriptActivated then return false end
     scriptActivated = true
 
-    print("✅ SCRIPT CHÍNH ĐANG ĐƯỢC LOAD...")
+    print("✅ KEY HỢP LỆ! Đang load script cho game này...")
     statusLabel.Text = "⏳ Đang tải script..."
     statusLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
 
-    local success, err = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/levanhai797130-ops/Test/refs/heads/main/Test.lua"))()
-    end)
+    local currentGameId = game.PlaceId
+    local scriptCode = GAME_SCRIPTS[currentGameId] or FALLBACK_SCRIPT
 
-    if not success then
-        warn("❌ Lỗi tải script: " .. tostring(err))
-        statusLabel.Text = "❌ Lỗi tải script! Vui lòng thử lại."
+    -- Kiểm tra nếu game không được hỗ trợ
+    if scriptCode == FALLBACK_SCRIPT then
+        warn("⚠️ Game chưa được hỗ trợ, ID: " .. tostring(currentGameId))
+        statusLabel.Text = "❌ Game này chưa được hỗ trợ"
         statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
         scriptActivated = false
         return false
     end
 
-    statusLabel.Text = "✅ Đã kích hoạt thành công! Chúc bạn chơi vui vẻ ❤️"
+    local success, err = pcall(function()
+        loadstring(scriptCode)()
+    end)
+
+    if not success then
+        warn("❌ Lỗi tải script: " .. tostring(err))
+        statusLabel.Text = "❌ Lỗi tải script! Thử lại sau."
+        statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+        scriptActivated = false
+        return false
+    end
+
+    -- Thành công
+    statusLabel.Text = "✅ Đã kích hoạt thành công! Chúc bạn chơi vui ❤️"
     statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
     activateBtn.Text = "✅ ĐÃ KÍCH HOẠT"
     activateBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
@@ -226,17 +300,9 @@ local function runMainScript()
     return true
 end
 
-getKeyBtn.MouseButton1Click:Connect(function()
-    statusLabel.Text = "🔑 Key: ADMIN_DEPTRAI (Đã copy vào clipboard)"
-    statusLabel.TextColor3 = Color3.fromRGB(0, 212, 255)
-    if setclipboard then
-        setclipboard("ADMIN_DEPTRAI")
-        statusLabel.Text = "📋 Đã copy key ADMIN_DEPTRAI vào clipboard!"
-    end
-    TweenService:Create(statusLabel, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-    task.wait(0.3)
-    TweenService:Create(statusLabel, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(0, 212, 255)}):Play()
-end)
+-- ============================================================
+--  SỰ KIỆN NÚT BẤM
+-- ============================================================
 
 activateBtn.MouseButton1Click:Connect(function()
     local enteredKey = keyBox.Text
@@ -245,11 +311,12 @@ activateBtn.MouseButton1Click:Connect(function()
         statusLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
         return
     end
-    if enteredKey == MASTER_KEY then
+    if isValidKey(enteredKey) then
         runMainScript()
     else
-        statusLabel.Text = "❌ Key không đúng! Key đúng là: ADMIN_DEPTRAI"
+        statusLabel.Text = "❌ Key không hợp lệ"
         statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+        -- Lắc hộp key
         local originalPos = keyBox.Position
         for i = 1, 5 do
             keyBox.Position = UDim2.new(0.1, math.random(-5, 5), 0.33, 0)
@@ -262,26 +329,50 @@ end)
 keyBox.FocusLost:Connect(function(enterPressed)
     if enterPressed then
         local enteredKey = keyBox.Text
-        if enteredKey == MASTER_KEY then
+        if enteredKey == "" then
+            statusLabel.Text = "⚠️ Vui lòng nhập key!"
+            statusLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+            return
+        end
+        if isValidKey(enteredKey) then
             runMainScript()
         else
-            statusLabel.Text = "❌ Key không đúng! Key đúng là: ADMIN_DEPTRAI"
+            statusLabel.Text = "❌ Key không hợp lệ"
             statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+            local originalPos = keyBox.Position
+            for i = 1, 5 do
+                keyBox.Position = UDim2.new(0.1, math.random(-5, 5), 0.33, 0)
+                task.wait(0.05)
+            end
+            keyBox.Position = originalPos
         end
     end
 end)
 
+getKeyBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard("Hãy liên hệ admin để lấy key hợp lệ")
+        statusLabel.Text = "📋 Đã copy thông báo vào clipboard!"
+        statusLabel.TextColor3 = Color3.fromRGB(0, 212, 255)
+    else
+        statusLabel.Text = "🔑 Vui lòng liên hệ admin để lấy key"
+    end
+    TweenService:Create(statusLabel, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+    task.wait(0.3)
+    TweenService:Create(statusLabel, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(0, 212, 255)}):Play()
+end)
+
+-- Phím tắt Ctrl+C copy thông báo
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     if input.KeyCode == Enum.KeyCode.C and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
         if setclipboard then
-            setclipboard("ADMIN_DEPTRAI")
-            statusLabel.Text = "📋 Đã copy key ADMIN_DEPTRAI vào clipboard!"
+            setclipboard("Hãy liên hệ admin để lấy key hợp lệ")
+            statusLabel.Text = "📋 Đã copy thông báo vào clipboard!"
             statusLabel.TextColor3 = Color3.fromRGB(0, 212, 255)
         end
     end
 end)
 
-print("🔑 KEY CỦA BẠN: ADMIN_DEPTRAI")
-print("📌 Hệ thống Key đã sẵn sàng!")
-statusLabel.Text = "🔑 Key: ADMIN_DEPTRAI (Nhấn 'LẤY KEY' để copy)"
+print("🔑 Hệ thống Key đã sẵn sàng!")
+statusLabel.Text = "🔑 Nhập key của bạn"
