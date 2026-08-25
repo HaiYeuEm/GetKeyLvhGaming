@@ -1,6 +1,6 @@
 -- ============================================================
 --                 KEY SYSTEM - BẢN QUYỀN
---       Kiểm tra key từ GitHub, load script theo game ID
+--       Kiểm tra key từ GitHub, load script theo GameId
 -- ============================================================
 
 local Players = game:GetService("Players")
@@ -14,20 +14,20 @@ if not player then return end
 --  CẤU HÌNH (SỬA THEO BẠN)
 -- ============================================================
 
--- URL raw của file KeyList.lua trên GitHub (chỉ chứa danh sách key)
 local GITHUB_KEYLIST_URL = "https://raw.githubusercontent.com/levanhai797130-ops/GetKeyLvhGaming/refs/heads/main/KeyList.Lua"
 
--- Định nghĩa script cho từng game (dùng game.PlaceId)
+-- Định nghĩa script cho từng game (dùng game.GameId)
+-- Nếu bạn dùng PlaceId, đổi key thành PlaceId và dùng game.PlaceId bên dưới
 local GAME_SCRIPTS = {
-    [-3951147015] = "loadstring(game:HttpGet('https://your-script-for-studio.lua'))()",   -- Game Studio Lite
-    [-10563114921] = "loadstring(game:HttpGet('https://your-script-for-egg.lua'))()",  -- Steal a Egg
+    [3951147015] = "loadstring(game:HttpGet('https://your-script-for-studio.lua'))()",   -- Game Studio Lite
+    [10563114921] = "loadstring(game:HttpGet('https://your-script-for-egg.lua'))()",      -- Steal a Egg
 }
 
--- Script dùng khi game không có trong danh sách (tùy chọn)
+-- Script dùng khi game không có trong danh sách
 local FALLBACK_SCRIPT = "print('Game không được hỗ trợ. Liên hệ admin.')"
 
 -- ============================================================
---  TẠO GIAO DIỆN (KHÔNG THAY ĐỔI)
+--  TẠO GIAO DIỆN (GIỮ NGUYÊN)
 -- ============================================================
 
 local gui = Instance.new("ScreenGui")
@@ -199,7 +199,7 @@ statusLabel.TextYAlignment = Enum.TextYAlignment.Top
 statusLabel.Parent = mainFrame
 
 -- ============================================================
---  LOGIC XỬ LÝ KEY VÀ LOAD SCRIPT
+--  LOGIC XỬ LÝ KEY VÀ LOAD SCRIPT (DÙNG GAMEID)
 -- ============================================================
 
 local scriptActivated = false
@@ -213,30 +213,47 @@ local function fetchKeyList()
     end)
     if not success or not result then
         warn("❌ Không thể tải KeyList từ GitHub")
+        statusLabel.Text = "❌ Lỗi tải keylist"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
         return nil
     end
     local func, err = loadstring(result)
     if not func then
         warn("❌ Lỗi parse KeyList: " .. tostring(err))
+        statusLabel.Text = "❌ Lỗi định dạng keylist"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
         return nil
     end
     local data = func()
     if type(data) ~= "table" then
         warn("❌ KeyList không đúng định dạng (phải là table)")
+        statusLabel.Text = "❌ Keylist sai cấu trúc"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
         return nil
     end
     cachedKeyList = data
+    print("✅ KeyList tải thành công, số lượng key:", table.count(data) or "không xác định")
     return data
 end
 
--- Kiểm tra key có tồn tại trong danh sách không (không cần gameId)
+-- Hàm đếm số phần tử trong table (hỗ trợ)
+local function table_count(t)
+    local count = 0
+    for _ in pairs(t) do count = count + 1 end
+    return count
+end
+
+-- Kiểm tra key có tồn tại trong danh sách không
 local function isValidKey(inputKey)
+    if not inputKey or inputKey == "" then return false end
+    -- Trim khoảng trắng
+    inputKey = string.gsub(inputKey, "^%s*(.-)%s*$", "%1")
     local keyData = fetchKeyList()
     if not keyData then return false end
     return keyData[inputKey] ~= nil
 end
 
--- Hủy giao diện với hiệu ứng
+-- Hủy giao diện
 local function destroyUI()
     TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
     TweenService:Create(title, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {TextTransparency = 1}):Play()
@@ -249,7 +266,7 @@ local function destroyUI()
     gui:Destroy()
 end
 
--- Load script dựa trên game ID
+-- Load script dựa trên GameId
 local function runMainScript()
     if scriptActivated then return false end
     scriptActivated = true
@@ -258,10 +275,15 @@ local function runMainScript()
     statusLabel.Text = "⏳ Đang tải script..."
     statusLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
 
-    local currentGameId = game.PlaceId
-    local scriptCode = GAME_SCRIPTS[currentGameId] or FALLBACK_SCRIPT
+    -- Lấy GameId (fallback sang PlaceId nếu cần)
+    local currentGameId = game.GameId or game.PlaceId
+    print("🔍 Game ID hiện tại (GameId/PlaceId):", currentGameId)
 
-    -- Kiểm tra nếu game không được hỗ trợ
+    local scriptCode = GAME_SCRIPTS[currentGameId]
+    if not scriptCode then
+        scriptCode = FALLBACK_SCRIPT
+    end
+
     if scriptCode == FALLBACK_SCRIPT then
         warn("⚠️ Game chưa được hỗ trợ, ID: " .. tostring(currentGameId))
         statusLabel.Text = "❌ Game này chưa được hỗ trợ"
@@ -271,7 +293,12 @@ local function runMainScript()
     end
 
     local success, err = pcall(function()
-        loadstring(scriptCode)()
+        local chunk = loadstring(scriptCode)
+        if not chunk then
+            error("loadstring thất bại, script code có thể sai")
+        else
+            chunk()
+        end
     end)
 
     if not success then
@@ -374,5 +401,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
-print("🔑 Hệ thống Key đã sẵn sàng!")
-statusLabel.Text = "🔑 Nhập key của bạn"
+print("🔑 Hệ thống Key đã sẵn sàng (dùng GameId)!")
+statusLabel.Text = "🔑 Đang tải keylist..."
+-- Tải trước keylist
+task.spawn(fetchKeyList)
