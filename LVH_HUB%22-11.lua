@@ -19,8 +19,8 @@ local GITHUB_KEYLIST_URL = "https://raw.githubusercontent.com/levanhai797130-ops
 
 -- Định nghĩa script cho từng game (dùng game.PlaceId)
 local GAME_SCRIPTS = {
-    [-10959918411] = "loadstring(game:HttpGet('https://your-script-for-studio.lua'))()",   -- Game Studio Lite
-    [-107778070777162] = "loadstring(game:HttpGet('https://your-script-for-egg.lua'))()",  -- Steal a Egg
+    [-3951147015] = "loadstring(game:HttpGet('https://your-script-for-studio.lua'))()",   -- Game Studio Lite
+    [-10563114921] = "loadstring(game:HttpGet('https://your-script-for-egg.lua'))()",  -- Steal a Egg
 }
 
 -- Script dùng khi game không có trong danh sách (tùy chọn)
